@@ -17,7 +17,7 @@ public class PlayerController : MonoBehaviour
     public Paw[] paws;  //Paws to instantiate... :|
     [SerializeField] List<Paw> pawlist = new List<Paw>();    //Fill this in for the later use! C:<
 
-    bool firstMove;
+    bool firstMove, levelEnded;
     private void Awake()
     {
         cam = FindObjectOfType<Camera>();
@@ -30,20 +30,23 @@ public class PlayerController : MonoBehaviour
     }
     private void Update()
     {
-#if UNITY_EDITOR
-        if (Input.GetMouseButton(0))
+        if (!levelEnded)
         {
-            Ray ray = cam.ScreenPointToRay(Input.mousePosition);
+#if UNITY_EDITOR
+            if (Input.GetMouseButton(0))
+            {
+                Ray ray = cam.ScreenPointToRay(Input.mousePosition);
 #elif UNITY_ANDROID
         if (Input.touchCount > 0)
         {
             Ray ray = cam.ScreenPointToRay(Input.touches[0].position);
 #endif
-            if(Physics.Raycast(ray, out RaycastHit hit))
-            {
-                if (hit.transform.CompareTag("Fish"))
+                if (Physics.Raycast(ray, out RaycastHit hit))
                 {
-                    target = new Vector3(hit.point.x, transform.position.y, hit.point.z);
+                    if (hit.transform.CompareTag("Fish"))
+                    {
+                        target = new Vector3(hit.point.x, transform.position.y, hit.point.z);
+                    }
                 }
             }
         }
@@ -60,6 +63,8 @@ public class PlayerController : MonoBehaviour
                 PawControl();
                 for (int i = 0; i < pawlist.Count; i++)
                     pawlist[i].HidePaw();
+
+                Timing.RunCoroutine(_EndLevel().CancelWith(gameObject));
             }
             transform.position = Vector3.MoveTowards(transform.position, target, speed * Time.fixedDeltaTime);
         }
@@ -101,12 +106,22 @@ public class PlayerController : MonoBehaviour
     void LevelComplete() => Timing.RunCoroutine(_LvlComplete().CancelWith(gameObject));
     IEnumerator<float> _LvlComplete()
     {
+        levelEnded = true;
         for (int i = 0; i < pawlist.Count; i++)
         {
             pawlist[i].lvlComplete = true;
             pawlist[i].ShowPaw();
             yield return Timing.WaitForSeconds(.05f);
         }
+
     }
     #endregion level complete />
+
+
+    //Change later!!! >xD
+    IEnumerator<float> _EndLevel()
+    {
+        yield return Timing.WaitForSeconds(5.0f);
+        LevelComplete();
+    }
 }
