@@ -9,6 +9,7 @@ public class Paw : MonoBehaviour
 
     public void HidePaw()
     {
+        transform.SetParent(null);
         if (!lvlComplete)
             Timing.RunCoroutine(_HidePaw().CancelWith(gameObject));
     }
@@ -20,4 +21,10 @@ public class Paw : MonoBehaviour
             gameObject.SetActive(false);
     }
 
+
+    public void ShowPaw()
+    {
+        if (lvlComplete)
+            gameObject.SetActive(true);
+    }
 }

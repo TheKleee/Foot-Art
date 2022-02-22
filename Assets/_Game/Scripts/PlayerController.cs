@@ -54,9 +54,10 @@ public class PlayerController : MonoBehaviour
         distance = Vector3.Distance(target, transform.position);
         if (distance > 0)
         {
-            if (firstMove)
+            if (!firstMove)
             {
-                firstMove = false;
+                firstMove = true;
+                PawControl();
                 for (int i = 0; i < pawlist.Count; i++)
                     pawlist[i].HidePaw();
             }
@@ -64,17 +65,48 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-
+    void PawControl()
+    {
+        Timing.KillCoroutines("PawCont");
+        Timing.RunCoroutine(_PawControl().CancelWith(gameObject), "PawCont");
+    }
     IEnumerator<float> _PawControl()
     {
         while(distance > 0)
         {
             leftPaw = !leftPaw;
+            #region Rotate Paw:
+            Vector3 lookDir = target - transform.position;
+            lookDir.y = 0;
+            Quaternion lookRot = Quaternion.LookRotation(lookDir);
+            #endregion
+            Paw p = Instantiate(paws[leftPaw ? 0 : 1]);
+            p.transform.SetParent(transform);
+            p.transform.localPosition = pawPos[leftPaw ? 0 : 1];
+            p.transform.rotation = lookRot;
+            pawlist.Add(p);
+            p.HidePaw();
+
             //Create a paw... L or R depending on the previous one xD
             //Remember to hide them :\
 
             //And don't forget to rotate the paw towards the move dir O.O
+            yield return Timing.WaitForSeconds(.2f);
+        }
+        yield return Timing.WaitForSeconds(.05f);
+        PawControl();
+    }
+
+    #region Level Complete:
+    void LevelComplete() => Timing.RunCoroutine(_LvlComplete().CancelWith(gameObject));
+    IEnumerator<float> _LvlComplete()
+    {
+        for (int i = 0; i < pawlist.Count; i++)
+        {
+            pawlist[i].lvlComplete = true;
+            pawlist[i].ShowPaw();
             yield return Timing.WaitForSeconds(.05f);
         }
     }
+    #endregion level complete />
 }
