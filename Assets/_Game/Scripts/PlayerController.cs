@@ -16,6 +16,9 @@ public class PlayerController : MonoBehaviour
     [Header("Paws:")]
     public Paw[] paws;  //Paws to instantiate... :|
     [SerializeField] List<Paw> pawlist = new List<Paw>();    //Fill this in for the later use! C:<
+    [Header("Paw Materials:")]
+    public Material[] pawMats;
+    public int pawMatID { get; set; }
 
     bool firstMove, levelEnded;
     private void Awake()
@@ -87,6 +90,7 @@ public class PlayerController : MonoBehaviour
             #endregion
             Paw p = Instantiate(paws[leftPaw ? 0 : 1]);
             p.transform.SetParent(transform);
+            p.SetChildMat(pawMats[pawMatID]);
             p.transform.localPosition = pawPos[leftPaw ? 0 : 1];
             p.transform.rotation = lookRot;
             pawlist.Add(p);
@@ -123,5 +127,11 @@ public class PlayerController : MonoBehaviour
     {
         yield return Timing.WaitForSeconds(5.0f);
         LevelComplete();
+    }
+
+    private void OnTriggerEnter(Collider splat)
+    {
+        if (splat.GetComponent<Splat>() != null)
+            pawMatID = splat.GetComponent<Splat>().splatID;
     }
 }

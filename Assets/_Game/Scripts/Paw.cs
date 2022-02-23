@@ -39,4 +39,10 @@ public class Paw : MonoBehaviour
                 fingers[i].SetActive(true);
         }
     }
+
+    public void SetChildMat(Material pawMat)
+    {
+        for (int i = 0; i < transform.childCount; i++)
+            transform.GetChild(i).GetComponent<MeshRenderer>().material = pawMat;
+    }
 }
