@@ -7,6 +7,12 @@ public class Paw : MonoBehaviour
 {
     public bool lvlComplete { private get; set; }
 
+    private void OnEnable()
+    {
+        var tempScale = transform.localScale;
+        transform.localScale *= .5f;
+        LeanTween.scale(gameObject, tempScale, .35f).setEaseOutBack();
+    }
     public void HidePaw()
     {
         transform.SetParent(null);
