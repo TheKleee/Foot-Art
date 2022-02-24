@@ -18,8 +18,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] List<Paw> pawlist = new List<Paw>();    //Fill this in for the later use! C:<
     [Header("Paw Materials:")]
     public Material[] pawMats;
-    public int pawMatID { get; set; }
-
+    [Header("Paw Parent:"), SerializeField]
+    Transform pawParent;
     bool firstMove, levelEnded;
     private void Awake()
     {
@@ -65,7 +65,7 @@ public class PlayerController : MonoBehaviour
                 firstMove = true;
                 PawControl();
                 for (int i = 0; i < pawlist.Count; i++)
-                    pawlist[i].HidePaw();
+                    pawlist[i].HidePaw(pawParent);
 
                 Timing.RunCoroutine(_EndLevel().CancelWith(gameObject));
             }
@@ -90,11 +90,11 @@ public class PlayerController : MonoBehaviour
             #endregion
             Paw p = Instantiate(paws[leftPaw ? 0 : 1]);
             p.transform.SetParent(transform);
-            p.SetChildMat(pawMats[pawMatID]);
+            p.SetChildMat(col);
             p.transform.localPosition = pawPos[leftPaw ? 0 : 1];
             p.transform.rotation = lookRot;
             pawlist.Add(p);
-            p.HidePaw();
+            p.HidePaw(pawParent);
 
             //Create a paw... L or R depending on the previous one xD
             //Remember to hide them :\
@@ -125,13 +125,20 @@ public class PlayerController : MonoBehaviour
     //Change later!!! >xD
     IEnumerator<float> _EndLevel()
     {
-        yield return Timing.WaitForSeconds(5.0f);
+        //yield return Timing.WaitForSeconds(5.0f);
+        while (pawParent.childCount < 30)
+            yield return Timing.WaitForSeconds(1.0f);
         LevelComplete();
     }
-
+   [SerializeField, Space] Color col;
     private void OnTriggerEnter(Collider splat)
     {
         if (splat.GetComponent<Splat>() != null)
-            pawMatID = splat.GetComponent<Splat>().splatID;
+            col = splat.GetComponent<Splat>().col;
+    }
+
+    void SetPawColor()
+    {
+
     }
 }

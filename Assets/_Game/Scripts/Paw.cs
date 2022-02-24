@@ -13,9 +13,9 @@ public class Paw : MonoBehaviour
         transform.localScale *= .5f;
         LeanTween.scale(gameObject, tempScale, .35f).setEaseOutBack();
     }
-    public void HidePaw()
+    public void HidePaw(Transform pawParent)
     {
-        transform.SetParent(null);
+        transform.SetParent(pawParent);
         if (!lvlComplete)
             Timing.RunCoroutine(_HidePaw().CancelWith(gameObject));
     }
@@ -46,9 +46,9 @@ public class Paw : MonoBehaviour
         }
     }
 
-    public void SetChildMat(Material pawMat)
+    public void SetChildMat(Color col)
     {
         for (int i = 0; i < transform.childCount; i++)
-            transform.GetChild(i).GetComponent<MeshRenderer>().material = pawMat;
+            transform.GetChild(i).GetComponent<MeshRenderer>().material.SetColor("_Color", col);
     }
 }
