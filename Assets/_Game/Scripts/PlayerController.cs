@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using MEC;
+using Tabtale.TTPlugins;
 
 public class PlayerController : MonoBehaviour
 {
@@ -23,6 +24,7 @@ public class PlayerController : MonoBehaviour
     bool firstMove, levelEnded;
     private void Awake()
     {
+        TTPCore.Setup();
         cam = FindObjectOfType<Camera>();
         target = transform.position;
         foreach (Transform p in transform)
